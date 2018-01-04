@@ -1,0 +1,59 @@
+﻿@using wikiPr.Models
+@using System.Globalization;
+@using System.Linq;
+@using System.Threading;
+@{
+    Layout = null;
+
+    string str = "";
+    string accueil = "Accueil";
+    string cree = "Site cree par:";
+
+    try {
+        str = Request.ServerVariables["HTTP_ACCEPT_LANGUAGE"];
+        Utilisateur u = Utilisateurs.FindByCourriel(User.Identity.Name);
+        if (User.Identity.IsAuthenticated && u != null) { str = u.accederLangue; }
+        if (ViewBag.cookie != null && ViewBag.cookie != "") { str = ViewBag.cookie; }
+
+
+        if (str.IndexOf("fr") != -1) {
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("fr");
+
+        }
+        if (str.IndexOf("en") != -1) {
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("en");
+
+        }
+        else if (str.IndexOf("es") != -1) {
+
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("es");
+        }
+    }
+    catch { str = "fr"; }
+
+    if (str.IndexOf("en") != -1) {
+        accueil = "Home";
+        cree = "This website was created by:";
+    }
+
+    if (str.IndexOf("es") != -1) {
+        accueil = "Recepción";
+        cree = "Este sitio web fue creado por:";
+    }
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>apropos</title>
+</head>
+<body style="background-color:cadetblue;">
+    @Html.ActionLink(@accueil, "index", "home")
+    <br /><br /><br />
+    <div>@cree Yassine Al Atia, Mohammed Hasni, Lucian Oglinda 
+    </div>
+   
+</body>
+</html>

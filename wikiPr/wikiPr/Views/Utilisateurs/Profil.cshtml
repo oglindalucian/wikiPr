@@ -1,0 +1,129 @@
+﻿@model wikiPr.Models.Views.UtilisateurProfil
+@using wikiPr.Models
+@using System.Globalization;
+@using System.Linq;
+@using System.Threading;
+
+@{
+    ViewBag.Title = "Profil";
+    Layout = "~/Views/Shared/Layout.cshtml";
+
+    string str = "";
+    string francais = "français";
+    string anglais = "anglais";
+    string espagnol = "espagnol";
+    string save = "Sauvegarder";
+    string accueil = "Accueil";
+    string mmp = "Modifier le mot de passe";
+    string prenom = "Prénom";
+    string famille = "Nom de famille";
+    string langue = "Langue";
+
+    try {
+        str = Request.ServerVariables["HTTP_ACCEPT_LANGUAGE"];
+        Utilisateur u = Utilisateurs.FindByCourriel(User.Identity.Name);
+        if (User.Identity.IsAuthenticated && u != null) { str = u.accederLangue; }
+        if (ViewBag.cookie != null && ViewBag.cookie != "") { str = ViewBag.cookie; }
+
+
+        if (str.IndexOf("fr") != -1) {
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("fr");
+
+        }
+        if (str.IndexOf("en") != -1) {
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("en");
+
+        }
+        else if (str.IndexOf("es") != -1) {
+
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("es");
+        }
+    }
+    catch { str = "fr"; }
+
+    if (str.IndexOf("en") != -1) {
+        francais = "French";
+        anglais = "English";
+        espagnol = "Spanish";
+        save = "Save";
+        accueil = "Home";
+        mmp = "Change password";
+        prenom = "First name";
+        famille = "Last name";
+        langue = "Language";
+    }
+
+    if (str.IndexOf("es") != -1) {
+        francais = "francés";
+        anglais = "inglés";
+        espagnol = "español";
+        save = "Guardar";
+        accueil = "Recepción";
+        mmp = "Cambiar contraseña";
+        prenom = "Nombre de pila";
+        famille = "Apellido";
+        langue = "Idioma";
+    }
+}
+
+
+
+@using (Html.BeginForm()) {
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @*@Html.HiddenFor(model => model.Id)*@
+        @*<input type="hidden" name="ReturnUrl" value="@ViewBag.ReturnUrl" />*@
+        <div class="form-group">
+            @*@Html.LabelFor(model => model.Prenom, htmlAttributes: new { @class = "control-label col-md-2" })*@
+            @*@wikiPr.Ressource.ResourceView.Prenom*@
+            @Html.Label(@prenom)
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Prenom, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Prenom, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @*@Html.LabelFor(model => model.NomFamille, htmlAttributes: new { @class = "control-label col-md-2" })*@
+            @*@wikiPr.Ressource.ResourceView.NomFamille*@
+            @Html.Label(@famille)
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.NomFamille, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.NomFamille, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+
+        <div class="form-group">
+            @*@Html.LabelFor(model => model.Langue, htmlAttributes: new { @class = "control-label col-md-2" })*@
+            @*@wikiPr.Ressource.ResourceView.Langue*@
+            @Html.Label(@langue)
+            <div class="col-md-10">
+                @*@Html.EditorFor(model => model.Langue, new { htmlAttributes = new { @class = "form-control" } })*@
+
+                @Html.DropDownList("Langue", new List<SelectListItem> {
+                new SelectListItem {Text=@francais, Value="fr", Selected=true},
+                new SelectListItem {Text=@espagnol, Value="es"},
+                new SelectListItem {Text=@anglais, Value="en"} })
+
+                @Html.ValidationMessageFor(model => model.Langue, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="@save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink(@accueil, "index", "home") ||
+    @Html.ActionLink(@mmp, "ModifierMdP", "Utilisateurs")
+</div>

@@ -1,0 +1,26 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Layout</title>
+    <link rel="stylesheet" type="text/css" href="~/content/style.css">
+</head>
+<body>
+    <div class="menu"> 
+        @RenderSection("up", false) 
+    </div>
+    <div class="tablemat">
+        @RenderSection("liste", false)
+    </div>
+    <div class="contenu">
+        @RenderBody()
+    </div>
+
+</body>
+</html>

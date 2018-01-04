@@ -1,0 +1,159 @@
+﻿@model wikiPr.Models.Article
+@using wikiPr.Models
+@using System.Globalization;
+@using System.Linq;
+@using System.Threading;
+@{
+    Layout = "~/Views/Shared/Layout.cshtml";
+
+    string str = "";
+    string creer = "Créer article";
+    string annuler = "Annuler l'ajout";
+    string titre = "Titre";
+    string contenu = "Contenu";
+    string appercu = "Aperçu de l'article";
+
+    try {
+        str = Request.ServerVariables["HTTP_ACCEPT_LANGUAGE"];
+        Utilisateur u = Utilisateurs.FindByCourriel(User.Identity.Name);
+        if (User.Identity.IsAuthenticated && u != null) { str = u.accederLangue; }
+        if (ViewBag.cookie != null && ViewBag.cookie != "") { str = ViewBag.cookie; }
+
+
+        if (str.IndexOf("fr") != -1) {
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("fr");
+
+        }
+        if (str.IndexOf("en") != -1) {
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("en");
+
+        }
+        else if (str.IndexOf("es") != -1) {
+
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("es");
+        }
+    }
+    catch { str = "fr"; }
+
+    if (str.IndexOf("en") != -1) {
+        creer = "Create article";
+        annuler = "Undo add article";
+        titre = "Title";
+        contenu = "Content";
+        appercu = "Preview";
+
+    }
+    if (str.IndexOf("es") != -1) {
+        creer = "Crear artículo";
+        annuler = "Deshacer añadir artículo";
+        titre = "Título";
+        contenu = "Contenido";
+        appercu = "Vista previa del artículo";
+    }
+
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>ajouter</title>
+    <script src="~/ckeditor/ckeditor.js"></script>
+    <script>
+      function copiertexte() {
+          var x = document.getElementById("texte").firstChild.firstChild.nodeValue;
+         // var x = document.getElementsByName("acopier")[0].firstChild.nodeValue;
+         // var x = document.getElementsByClassName("ckeditor")[0].firstChild.nodeValue;
+         // var x = document.getElementsByTagName("textarea")[0].innerHTML;
+        document.getElementById("apercu_art").innerHTML = x;
+    }
+    </script>
+</head>
+<body>
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+
+    @section up {
+       @Html.Partial("ViewUp")
+    }
+
+    @section liste {
+       @Html.Partial("ViewListe")
+    }
+    
+    
+    @using (Html.BeginForm()) 
+    {
+        @Html.AntiForgeryToken()
+        
+        <div class="form-horizontal">
+           
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="form-group">
+                @*@Html.LabelFor(model => model.Titre, htmlAttributes: new { @class = "control-label col-md-2" })*@
+                @*@wikiPr.Ressource.ResourceView.Titre*@
+                @Html.Label(@titre)
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.accederTitre, new { htmlAttributes = new { @class = "form-control", @value = @ViewBag.letitre } })
+                    @Html.ValidationMessageFor(model => model.accederTitre, "", new { @class = "text-danger" })
+                </div>
+            </div>
+           
+                @*<div class="form-group">*@
+                    @*@Html.LabelFor(model => model.Contenu, htmlAttributes: new { @class = "control-label col-md-2" })*@
+                    @*@wikiPr.Ressource.ResourceView.Contenu*@
+                    @Html.Label(@contenu)<br/>
+                    @*<div class="col-md-10">*@
+           
+
+                @Html.TextAreaFor(model => model.accederContenu, new { @class = "ckeditor", @id = "acopier", @name = "acopier" })   @*@form = "confirmationForm"*@
+                 
+            
+                         
+
+                        @Html.ValidationMessageFor(model => model.accederContenu, "", new { @class = "text-danger" })
+                    @*</div>*@
+                @*</div>*@
+            
+            
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="@creer" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>
+    }
+    <br />
+    <div>
+        @Html.ActionLink(@annuler, "Index")
+    </div>
+    <br />
+    <div>
+        @*@Html.Action("ajouterApercu")*@
+        @*<button onclick="copiertexte()">@appercu</button>*@
+
+        @*<button onclick="window.location = '/home/ajouterApercu';">@appercu</button>*@
+        
+        @*<input type="hidden" value="" name="apercu" />*@
+        <form action="/home/ajouterApercu"  name="confirmationForm">
+            @*<input type="hidden" value="" name="apercu" />*@
+            <input type="submit" value="@appercu"  />
+        </form>
+
+        <br />
+        @*@Html.ActionLink(@appercu, "ajouterApercu", "home")*@
+</div>
+    
+    <br/>
+   
+  
+    <div id="apercu_art"></div>    
+    
+    
+</body>
+</html>

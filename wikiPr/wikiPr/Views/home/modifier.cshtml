@@ -1,0 +1,128 @@
+﻿@model wikiPr.Models.Article
+@using wikiPr.Models
+@using System.Globalization;
+@using System.Linq;
+@using System.Threading;
+@{
+    Layout = "~/Views/Shared/Layout.cshtml";
+
+    string str = "";
+    string sauvegarder = "Sauvegarder";
+    string anmod = "Annuler modification";
+    string accueil = "Accueil";
+    string suppr = "Supprimer article";
+    string titre = "Titre";
+    string contenu = "Contenu";
+    string apercu = "Aperçu de l'article";
+
+    try {
+        str = Request.ServerVariables["HTTP_ACCEPT_LANGUAGE"];
+        Utilisateur u = Utilisateurs.FindByCourriel(User.Identity.Name);
+        if (User.Identity.IsAuthenticated && u != null) { str = u.accederLangue; }
+        if (ViewBag.cookie != null && ViewBag.cookie != "") { str = ViewBag.cookie; }
+
+
+        if (str.IndexOf("fr") != -1) {
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("fr");
+
+        }
+        if (str.IndexOf("en") != -1) {
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("en");
+
+        }
+        else if (str.IndexOf("es") != -1) {
+
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("es");
+        }
+    }
+    catch { str = "fr"; }
+
+    if (str.IndexOf("en") != -1) {
+        sauvegarder = "Save";
+        anmod = "Undo changes";
+        accueil = "Home";
+        suppr = "Delete article";
+        titre = "Title";
+        contenu = "Content";
+        apercu = "Preview";
+
+    }
+
+    if (str.IndexOf("es") != -1) {
+        sauvegarder = "Salvar";
+        anmod = "Deshacer cambios";
+        accueil = "Recepción";
+        suppr = "Eliminar artículo";
+        titre = "Título";
+        contenu = "Contenido";
+        apercu = "Vista previa del artículo";
+    }
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>modifier</title>
+    <script src="~/ckeditor/ckeditor.js"></script>
+</head>
+<body>
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    
+    @section up {
+       @Html.Partial("ViewUp")
+    }
+
+    @section liste {
+       @Html.Partial("ViewListe")
+    }
+
+
+    
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        
+        <div class="form-horizontal">
+           
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @*@Html.HiddenFor(model => model.Id)*@
+    
+            <div class="form-group">
+                @Html.Label(@titre)
+                @*@wikiPr.Ressource.ResourceView.Titre*@
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.accederTitre, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.accederTitre, "", new { @class = "text-danger" })
+                </div>
+            </div>
+    
+            <div class="form-group">
+                @Html.Label(@contenu)
+                @*@wikiPr.Ressource.ResourceView.Contenu*@
+                 <div class="col-md-10">
+                    @*@Html.TextAreaFor(model => model.Contenu, new { htmlAttributes = new { @class = "form-control" } })*@
+                    @Html.TextAreaFor(model => model.accederContenu, new { @class = "ckeditor", @id = "acopier" })
+                    @Html.ValidationMessageFor(model => model.accederContenu, "", new { @class = "text-danger" })
+                </div>
+            </div>
+    
+               
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="@sauvegarder" class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+    }
+    
+    <div>
+        @Html.ActionLink(@anmod, "afficher", new { Titre = Model.accederTitre }, null) |
+        @Html.ActionLink(@accueil, "Index") |
+        @Html.ActionLink(@suppr, "supprimer", new { Titre = Model.accederTitre }, null)
+    </div>
+</body>
+</html>

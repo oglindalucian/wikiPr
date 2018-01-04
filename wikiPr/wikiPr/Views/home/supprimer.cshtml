@@ -1,0 +1,145 @@
+﻿@model wikiPr.Models.Article
+@using wikiPr.Models
+@using System.Globalization;
+@using System.Linq;
+@using System.Threading;
+@{
+    Layout = "~/Views/Shared/Layout.cshtml";
+
+    string str = "";
+    string question = "Êtes-vous sûr de vouloir supprimer cet article?";
+    string ladate = "La date de la dernière modification:";
+    string revision = "Révision:";
+    string leid = "Le ID du contributeur:";
+    string effacer = "Effacer article";
+    string annuler = "Annuler la suppression";
+
+
+    try {
+        str = Request.ServerVariables["HTTP_ACCEPT_LANGUAGE"];
+        Utilisateur u = Utilisateurs.FindByCourriel(User.Identity.Name);
+        if (User.Identity.IsAuthenticated && u != null) { str = u.accederLangue; }
+        if (ViewBag.cookie != null && ViewBag.cookie != "") { str = ViewBag.cookie; }
+
+
+        if (str.IndexOf("fr") != -1) {
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("fr");
+
+        }
+        if (str.IndexOf("en") != -1) {
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("en");
+
+        }
+        else if (str.IndexOf("es") != -1) {
+
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("es");
+        }
+    }
+    catch { str = "fr"; }
+
+    if (str.IndexOf("en") != -1) {
+        question = "Are you sure you want to delete this article?";
+        ladate = "Latest modification date:";
+        revision = "Review:";
+        leid = "Contributor's ID:";
+        effacer = "Delete article";
+        annuler = "Undo delete";
+    }
+
+    if (str.IndexOf("es") != -1) {
+        question = "¿Está seguro de que desea eliminar este artículo";
+        ladate = "Última fecha de modificación:";
+        revision = "Revisión:";
+        leid = "ID del colaborador:";
+        effacer = "Eliminar artículo";
+        annuler = "Deshacer eliminación";
+    }
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>supprimer</title>
+</head>
+<body>
+
+    @section up {
+       @Html.Partial("ViewUp")
+    }
+
+    @section liste {
+        @Html.Partial("ViewListe")
+    }
+
+
+    <h3>@question</h3>
+    <div>
+       
+        <dl class="dl-horizontal">
+            <dt>
+                @*@Html.DisplayNameFor(model => model.Titre)*@
+            </dt>
+    
+            <dd>
+                <div class="affichageTitre" style="margin-left:20px;">
+                    @Html.DisplayFor(model => model.accederTitre)
+                </div>
+            </dd>
+    
+            <dt>
+                @*@Html.DisplayNameFor(model => model.Contenu)*@
+            </dt>
+    
+            <dd>
+                @*@Html.DisplayFor(model => model.Contenu)*@
+            </dd>
+    
+            <dt>
+                @*@Html.DisplayNameFor(model => model.DateModification)*@
+                @*@wikiPr.Ressource.ResourceView.DateModification*@
+            </dt>
+    
+            <dd>
+                <br /><br />
+                <div class="ladate">
+                    @ladate @Html.DisplayFor(model => model.accederDateModification)
+                </div>
+            </dd>
+    
+            <dt>
+                @*@Html.DisplayNameFor(model => model.Revision)*@
+                @*@wikiPr.Ressource.ResourceView.Revision*@
+            </dt>
+    
+            <dd>
+                <div class="ladate">
+                    @revision @Html.DisplayFor(model => model.accederRevision)
+                </div>
+            </dd>
+    
+            <dt>
+                @*@Html.DisplayNameFor(model => model.IdContributeur)*@
+                @*@wikiPr.Ressource.ResourceView.IdContributeur*@
+            </dt>
+    
+            <dd>
+                <div class="ladate">
+                    @leid @Html.DisplayFor(model => model.IdContributeur)
+                </div>
+            </dd>
+    
+        </dl>
+    
+        @using (Html.BeginForm()) {
+            @Html.AntiForgeryToken()
+    
+            <div class="form-actions no-color">
+                <input type="submit" value="@effacer" class="btn btn-default" /> |
+                @Html.ActionLink(@annuler, "afficher", new { Titre = Model.accederTitre }, null)
+            </div>
+        }
+    </div>
+</body>
+</html>

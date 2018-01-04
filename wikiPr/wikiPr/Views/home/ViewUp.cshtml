@@ -1,0 +1,142 @@
+﻿
+@using wikiPr.Models
+@using System.Globalization;
+@using System.Linq;
+@using System.Threading;
+
+@{ 
+    string str = "";
+    string inscription = "Inscription";
+    string connexion = "Connexion";
+    string accueil = "Accueil";
+    string ajouterarticle = "Ajouter article";
+    string apropos = "À propos";
+    string profil = "Profil";
+    string deconnexion = "Déconnexion";
+    string bonjour = "Bonjour";
+    string langue = "Langue";
+    string francais = "Francais";
+    string anglais = "Anglais";
+    string espagnol = "Espagnol";
+    string go = "Aller";
+   
+
+    try {
+        str = Request.ServerVariables["HTTP_ACCEPT_LANGUAGE"];
+        Utilisateur u = Utilisateurs.FindByCourriel(User.Identity.Name);
+        if (User.Identity.IsAuthenticated && u != null) { str = u.accederLangue; }
+        
+        if (ViewBag.cookie != null && ViewBag.cookie != "") { str = ViewBag.cookie; }
+
+
+        if (str.IndexOf("fr") != -1) {
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("fr");
+
+        }
+        if (str.IndexOf("en") != -1) {
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("en");
+
+        }
+        else if (str.IndexOf("es") != -1) {
+
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("es");
+        }
+
+    
+    }
+    catch { str = "fr"; }
+
+    if (str.IndexOf("fr") != -1) {
+        inscription = "Inscription";
+        connexion = "Connexion";
+        accueil = "Accueil";
+        ajouterarticle = "Ajouter article";
+        apropos = "À propos";
+        profil = "Profil";
+        deconnexion = "Déconnexion";
+        bonjour = "Bonjour";
+        francais = "Francais";
+        anglais = "Anglais";
+        espagnol = "Espagnol";
+        langue = "Langue";
+    }
+
+    if (str.IndexOf("en") != -1) {
+        inscription = "Sign up";
+        connexion = "Sign in";
+        accueil = "Home";
+        ajouterarticle = "Add article";
+        apropos = "About";
+        profil = "Profile";
+        deconnexion = "Log out";
+        bonjour = "Hello";
+        francais = "French";
+        anglais = "English";
+        espagnol = "Spanish";
+        langue = "Language";
+        go = "Go!";
+    }
+
+    if (str.IndexOf("es") != -1) {
+        inscription = "Regístrate";
+        connexion = "Conexión";
+        accueil = "Recepción";
+        ajouterarticle = "Añadir artículo";
+        apropos = "A proposito";
+        profil = "Perfil";
+        deconnexion = "Cerrar sesión";
+        bonjour = "Hola";
+        francais = "Francés";
+        anglais = "Inglés";
+        espagnol = "Español";
+        langue = "Lengua";
+        go = "Ir!";
+    }
+}
+
+
+<br />
+<div class="btn_accueil">
+    <a class="btn" href="/home/index">@accueil</a>
+</div>
+<div class="btn_ajouter">
+    <a class="btn" href="/home/ajouter">@ajouterarticle</a>
+</div>
+<div class="btn_apropos">
+    <a class="btn" href="/home/apropos">@apropos</a>
+</div>
+<div id="btn_langue">
+    <form action="/home/ViewUp" method="post">
+        <select id="lalang" name="lalang">
+            <option selected>@langue</option>
+            <option value="fr">Français</option>
+            <option value="es">Español</option>
+            <option value="en">English</option>
+        </select>
+        <input type="submit" value="GO!" name="choixLangue" />
+    </form> 
+
+  
+       
+</div>
+
+
+
+
+@if (!User.Identity.IsAuthenticated) {
+    <div class="inscription">
+        <a href="/Utilisateurs/Inscription">@inscription</a>
+    </div>
+    <div class="connexion">
+        <a href="/Utilisateurs/Connexion">@connexion</a>
+    </div>
+}
+else if (User.Identity.IsAuthenticated) {
+    <div class="inscription">
+        <a href="/Utilisateurs/Profil">@profil</a>
+    </div>
+    <div class="connexion">
+        <a href="/Utilisateurs/Logout">@deconnexion</a>
+    </div>
+    <div class="bonjour">@bonjour @User.Identity.Name!</div>
+}

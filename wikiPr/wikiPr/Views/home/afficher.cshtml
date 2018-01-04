@@ -1,0 +1,168 @@
+﻿@model wikiPr.Models.Article
+@using wikiPr.Models
+@using System.Globalization;
+@using System.Linq;
+@using System.Threading;
+
+@{
+    Layout = "~/Views/Shared/Layout.cshtml";
+
+    string str = "";
+    string ladate = "La date de la dernière modification:";
+    string revision = "Révision:";
+    string leid = "Le ID du contributeur:";
+    string nexistepas = "Cet article n'existe pas!";
+    string ajouterart = "Ajouter l'article:";
+    string ajouter = "Ajouter";
+    string modifier = "Modifier";
+    string accueil = "Accueil";
+
+    try {
+        str = Request.ServerVariables["HTTP_ACCEPT_LANGUAGE"];
+        Utilisateur u = Utilisateurs.FindByCourriel(User.Identity.Name);
+        if (User.Identity.IsAuthenticated && u != null) { str = u.accederLangue; }
+        if (ViewBag.cookie != null && ViewBag.cookie != "") { str = ViewBag.cookie; }
+
+
+        if (str.IndexOf("fr") != -1) {
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("fr");
+
+        }
+        if (str.IndexOf("en") != -1) {
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("en");
+
+        }
+        else if (str.IndexOf("es") != -1) {
+
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("es");
+        }
+    }
+    catch { str = "fr"; }
+
+    if (str.IndexOf("en") != -1) {
+        ladate = "Latest modification date:";
+        revision = "Review:";
+        leid = "Contributor's ID:";
+        nexistepas = "This article doesn't exist!";
+        ajouterart = "Add article:";
+        ajouter = "Add";
+        modifier = "Modify";
+        accueil = "Home";
+    }
+
+    if (str.IndexOf("es") != -1) {
+        ladate = "Última fecha de modificación:";
+        revision = "Revisión:";
+        leid = "ID del colaborador:";
+        nexistepas = "Este artículo no existe!";
+        ajouterart = "Añadir artículo:";
+        ajouter = "Añadir";
+        modifier = "Modificar";
+        accueil = "Recepción";
+    }
+
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>afficher</title>
+</head>
+<body>
+
+    @section up {
+       @Html.Partial("ViewUp")
+    }
+
+    @section liste {
+       @Html.Partial("ViewListe")
+    }
+
+
+    
+        <hr />
+    <div>
+        @{
+            try {
+                if (Model.accederContenu != null && Model.accederContenu != "") {
+                    <dl class="dl-horizontal">
+                        <dt>
+                            @*@Html.DisplayNameFor(model => model.Titre)*@
+                        </dt>
+
+                        <dd>
+                            <div class="affichageTitre">
+                                @Html.DisplayFor(model => model.accederTitre)
+                                @*@wikiPr.Ressource.ResourceView.Titre*@
+                            </div>
+                        </dd>
+
+                        <dt>
+                            @*@Html.DisplayNameFor(model => model.Contenu)*@
+                        </dt>
+
+                        <dd>
+                            @*@Html.DisplayFor(model => model.Contenu)*@
+                            <br /><br /> <div class="affichageContenu">
+                                @Html.Raw(Model.accederContenu)
+                            </div>
+                        </dd>
+
+                        <dt>
+                            @*@Html.DisplayNameFor(model => model.DateModification)*@
+                            @*@wikiPr.Ressource.ResourceView.DateModification*@
+                        </dt>
+
+                        <dd>
+                            <br /><br />
+                            <div class="ladate">
+                              
+                                @ladate @Html.DisplayFor(model => model.accederDateModification)
+                            </div>
+                        </dd>
+
+                        <dt>
+                            @*@Html.DisplayNameFor(model => model.Revision)*@
+                        </dt>
+
+                        <dd>
+                            <div class="ladate">
+                                @revision @Html.DisplayFor(model => model.accederRevision)
+                            </div>
+                        </dd>
+
+                        <dt>
+                            @*@Html.DisplayNameFor(model => model.IdContributeur)*@
+                            @*@wikiPr.Ressource.ResourceView.IdContributeur*@
+                        </dt>
+
+                        <dd>
+                            <div class="ladate">
+                                @leid @Html.DisplayFor(model => model.IdContributeur)
+                            </div>
+                        </dd>
+
+                    </dl>
+                }
+                else {
+                    <h3 style="color:red">@nexistepas</h3>
+                    <p>@ajouterart @Html.ActionLink(@ajouter, "ajouter", "home", new { Titre = Model.accederTitre }, null)</p>
+                }
+            }
+            catch (NullReferenceException e) { }
+        }
+
+    </div>
+    <p>
+        @try {
+            if(User.Identity.IsAuthenticated) { 
+        @Html.ActionLink(@modifier, "modifier", new { Titre = Model.accederTitre }, null) }
+        }
+        catch { } ||
+        @Html.ActionLink(@accueil, "index", "home") ||
+    </p>
+          
+</body>
+</html>

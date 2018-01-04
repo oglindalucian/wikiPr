@@ -1,0 +1,92 @@
+﻿@model wikiPr.Models.Views.UtilisateurMP
+@using wikiPr.Models
+@using System.Globalization;
+@using System.Linq;
+@using System.Threading;
+@{
+    ViewBag.Title = "ModifierMdP";
+    Layout = "~/Views/Shared/Layout.cshtml";
+
+    string str = "";
+    string save = "Sauvegarder";
+    string accueil = "Accueil";
+    string mdp = "Mot de passe nouveau";
+    string ancien = "Mot de passe ancien";
+    string er = "Mot de passe incorrect";
+    try {
+        str = Request.ServerVariables["HTTP_ACCEPT_LANGUAGE"];
+        Utilisateur u = Utilisateurs.FindByCourriel(User.Identity.Name);
+        if (User.Identity.IsAuthenticated && u != null) { str = u.accederLangue; }
+        if (ViewBag.cookie != null && ViewBag.cookie != "") { str = ViewBag.cookie; }
+
+
+        if (str.IndexOf("fr") != -1) {
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("fr");
+
+        }
+        if (str.IndexOf("en") != -1) {
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("en");
+
+        }
+        else if (str.IndexOf("es") != -1) {
+
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("es");
+        }
+    }
+    catch { str = "fr"; }
+
+    if (str.IndexOf("en") != -1) {
+        save = "Save";
+        accueil = "Home";
+        mdp = "New password";
+        ancien = "Old password";
+        er = "Wrong password";
+    }
+
+    if (str.IndexOf("es") != -1) {
+        save = "Guardar";
+        accueil = "Recepción";
+        mdp = "Nueva contraseña";
+        ancien = "Contraseña anterior";
+        er = "Contraseña incorrecta";
+    }
+
+}
+
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        
+        <span style="color:red;">@ViewBag.error</span>
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+           @Html.Label(@ancien)
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.MDP1, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.MDP1, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+           @Html.Label(@mdp)
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.MDP2, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.MDP2, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="@save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink(@accueil, "Index", "home")
+</div>

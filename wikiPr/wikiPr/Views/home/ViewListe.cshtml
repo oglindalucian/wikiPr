@@ -1,0 +1,19 @@
+﻿
+@using wikiPr.Models
+
+
+<table class="table">
+    @foreach (Article a in ViewBag.lesArticles) {
+        string letitre = a.accederTitre;
+
+        <tr>
+            <td>
+                @Html.ActionLink(letitre, "afficher", "home", new { Titre = letitre }, null)
+            </td>
+            <td>
+                @a.accederDateModification
+            </td>
+        </tr>
+    }
+</table>
+

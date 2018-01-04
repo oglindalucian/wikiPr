@@ -1,0 +1,164 @@
+﻿@model IEnumerable<wikiPr.Models.Article>
+@using wikiPr.Models
+@using System.Globalization;
+@using System.Linq;
+@using System.Threading;
+@using System;
+@using System.Collections.Generic;
+@using wikiPr.Controllers
+
+@{
+    Layout = "~/Views/Shared/Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>index</title>
+    @{
+        int compteur = 0;
+        List<string> listedestitres = new List<string>();
+        string titrealire = "";
+        string letitre = "";
+
+        string bienvenue = "Bienvenus/bienvenues sur notre site!";
+        string auna = "Ajouter un nouvel article";
+        string str = "";
+        string titre = "Titre";
+        string date = "Dernière date de modification";
+        string lire = "Lire";
+
+        try {
+            str = Request.ServerVariables["HTTP_ACCEPT_LANGUAGE"];
+            Utilisateur u = Utilisateurs.FindByCourriel(User.Identity.Name);
+            if (User.Identity.IsAuthenticated && u != null) { str = u.accederLangue; }
+           
+            if(ViewBag.cookie!=null && ViewBag.cookie!="") { str = ViewBag.cookie; }
+
+
+            if (str.IndexOf("fr") != -1) {
+                Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("fr");
+
+            }
+            if (str.IndexOf("en") != -1) {
+                Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("en");
+
+            }
+            else if (str.IndexOf("es") != -1) {
+
+                Thread.CurrentThread.CurrentUICulture = CultureInfo.CreateSpecificCulture("es");
+            }
+        }
+
+        catch { str = "fr"; }
+
+        if (str.IndexOf("en") != -1) {
+            bienvenue = "Welcome to our website!";
+            auna = "Add a new article";
+            titre = "Title";
+            date = "Latest modification date";
+            lire = "Read";
+        }
+        if (str.IndexOf("es") != -1) {
+            bienvenue = "Bienvenido a nuestro sitio web!";
+            auna = "Añadir un nuevo artículo";
+            titre = "Título";
+            date = "Última fecha de modificación";
+            lire = "Leer";
+        }
+    }
+
+</head>
+<body>
+    @section up {
+      @Html.Partial("ViewUp")
+        }
+   
+            <table class="table">
+                <tr>
+                    <th>
+                        @*@Html.DisplayNameFor(model => model.Titre)*@
+                        @*@wikiPr.Ressource.ResourceView.Titre*@
+                        @Html.Label(@titre) 
+                    </th>
+
+                    <th>
+                        @*@Html.DisplayNameFor(model => model.DateModification)*@
+                        @*@wikiPr.Ressource.ResourceView.DateModification*@
+                        @Html.Label(@date)
+                    </th>
+
+                    <th></th>
+                </tr>
+             
+
+
+
+                @{ if (ViewBag.lesArticles != null) {
+                        
+                        try {
+
+                            foreach (Article a in ViewBag.lesArticles) {
+                                letitre = a.accederTitre;
+                               <tr>
+                                    <td>
+                                        @Html.ActionLink(letitre, "afficher", "home", new { Titre = letitre }, null)
+                                    </td>
+                                    <td>
+                                        @a.accederDateModification
+                                    </td>
+                                </tr>
+                            }
+
+                        }
+                        catch { }
+                    }
+                }
+        
+    </table>
+
+    <div class="bienvenue">
+       
+        @bienvenue 
+    </div>
+
+
+    @{ if (ViewBag.lesArticles != null) {
+                try {
+                    foreach (Article a in ViewBag.lesArticles) {
+                        letitre = a.accederTitre;
+                        listedestitres.Add(letitre);
+                        compteur++;
+                    }
+
+                    int kompt = 0;
+                    bool ok = true;
+                    Random rand = new Random();
+                    int x = rand.Next(1, compteur);
+                    foreach (string s in listedestitres) {
+                        kompt++;
+                        if (kompt == x && ok) {
+                            titrealire = s;
+                            ok = false;
+                        }
+                    }
+                }
+                catch { }
+            }
+    }
+
+    <form action="/home/index" method="post">
+        <input type="text" value="@titrealire" id="texte" name="texte" />&nbsp;&nbsp;&nbsp;&nbsp;  @*readonly="readonly"*@
+        <input type="submit" value="@lire" />   @*onclick="window.location = '/home/afficher?Titre=@titrealire';"*@
+    </form>
+
+  
+     
+    <br/><br/><br />
+    @Html.ActionLink(@auna, "ajouter")
+
+   
+</body>
+</html>
